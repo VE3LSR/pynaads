@@ -2,6 +2,7 @@
 
 from shapely.geometry import Point, Polygon
 from datetime import datetime, timedelta
+from collections import OrderedDict
 # from signxml import XMLVerifier # See Issue 4
 import logging
 import socket
@@ -79,24 +80,39 @@ class naads():
     #
     # Returns the first point position within the poly or false
 
+    def _filter_in_geo(self, poly, points):
+        p = [tuple(map(float,s.split(','))) for s in poly.split(' ')]
+        poly = Polygon(p)
+        counter = 0
+        if all(isinstance(item, tuple) for item in points):
+            for point in points:
+                counter += 1
+                p1 = Point(point[0], point[1])
+                if p1.within(poly):
+                    return counter
+        else:
+            p1 = Point(points[0], points[1])
+            if p1.within(poly):
+                return 1
+            else:
+                return False
+
     def filter_in_geo(self, alert, points):
-        for infos in alert.findAll('info'):
-            for areas in infos.findAll('area'):
-                if areas.find("polygon"):
-                    p = [tuple(map(float,s.split(','))) for s in areas.polygon.string.split(' ')]
-                    poly = Polygon(p)
-                    counter = 0
-                    if all(isinstance(item, tuple) for item in points):
-                        for point in points:
-                            counter += 1
-                            p1 = Point(point[0], point[1])
-                            if p1.within(poly):
-                                return counter
-                    else:
-                        p1 = Point(points[0], points[1])
-                        if p1.within(poly):
-                            return 1
-        return False
+        for infos in alert['info']:
+            if isinstance(infos, str):
+                if isinstance(alert['info']['area'], OrderedDict):
+                    if "polygon" in alert['info']['area']:
+                        return self._filter_in_geo(alert['info']['area']['polygon'], points)
+                else:
+                    logger.error("Geo Filter not implemented: A")
+                    pass
+            else:
+                if isinstance(infos['area'], OrderedDict):
+                    if "polygon" in infos['area']:
+                        return self._filter_in_geo(infos['area']['polygon'], points)
+                else:
+                    logger.error("Geo Filter not implemented: B")
+                    pass
 
     def parse(self, data):
         alert = xmltodict.parse(data)
