@@ -6,12 +6,15 @@ from datetime import datetime, timedelta
 # from signxml import XMLVerifier # See Issue 4
 import logging
 import socket
+from threading import Thread
+import queue
+
 
 logger = logging.getLogger("naads.pelmorex")
-logger.setLevel(logging.INFO)
+# logger.setLevel(logging.INFO)
 
 class naads():
-    def __init__(self):
+    def __init__(self, passhb=False):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.TCP_HOST="streaming2.naad-adna.pelmorex.com"
         self.TCP_IP = socket.gethostbyname( self.TCP_HOST )
@@ -21,6 +24,8 @@ class naads():
         self.EOATEXT = b"</alert>"
         self.lastheartbeat = datetime.now()
         self.connected = False
+        self.passhb = passhb
+        self.queue = queue.LifoQueue()
 
     def _reconnect(self):
         logger.debug("Reconnecting")
@@ -40,7 +45,7 @@ class naads():
         self.s.settimeout(10)
         self.lastheartbeat = datetime.now()
 
-    def start(self):
+    def local_start(self, queue):
         while 1:
             if self.lastheartbeat + timedelta(minutes=2) < datetime.now():
                 logger.debug('Missing heartbeat')
@@ -50,11 +55,23 @@ class naads():
                 result = self.parse(result)
                 if result.sender.string != "NAADS-Heartbeat":
                     logger.info('Alert received', extra={'sender': result.sender.string})
-                    self.save(result)
-                    logger.debug(result.prettify())
+                    queue.put(result)
                 else:
                     logger.debug('Heartbeat received', extra={'sender': result.sender.string})
+                    if self.passhb:
+                        queue.put(result)
                     self.lastheartbeat = datetime.now()
+
+    def getQueue(self):
+        if not self.queue.empty():
+            return self.queue.get()
+        else:
+            return False
+
+    def start(self):
+        self.worker = Thread(target=self.local_start, args=(self.queue, ))
+        self.worker.setDaemon(True)
+        self.worker.start()
 
     # Checks to see if a point is in the alert poly
     # alert: The alert data
