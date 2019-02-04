@@ -3,6 +3,7 @@
 import colorlog
 import logging
 import pynaads
+import json
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -17,4 +18,4 @@ p.start()
 while True:
     item = p.getQueue()
     if item:
-        logger.debug(item.prettify())
+        logger.debug(json.dumps(item))

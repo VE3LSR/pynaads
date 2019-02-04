@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from bs4 import BeautifulSoup
 from shapely.geometry import Point, Polygon
 from datetime import datetime, timedelta
 # from signxml import XMLVerifier # See Issue 4
@@ -8,6 +7,7 @@ import logging
 import socket
 from threading import Thread
 import queue
+import xmltodict
 
 
 logger = logging.getLogger("naads.pelmorex")
@@ -53,11 +53,11 @@ class naads():
             result = self.read()
             if result != False:
                 result = self.parse(result)
-                if result.sender.string != "NAADS-Heartbeat":
-                    logger.info('Alert received', extra={'sender': result.sender.string})
+                if result["sender"] != "NAADS-Heartbeat":
+                    logger.info('Alert received', extra={'sender': result["sender"]})
                     queue.put(result)
                 else:
-                    logger.debug('Heartbeat received', extra={'sender': result.sender.string})
+                    logger.debug('Heartbeat received', extra={'sender': result["sender"]})
                     if self.passhb:
                         queue.put(result)
                     self.lastheartbeat = datetime.now()
@@ -99,12 +99,8 @@ class naads():
         return False
 
     def parse(self, data):
-        alert = BeautifulSoup(data, "xml")
-        return alert
-
-    def save(self, data, directory="savedata"):
-        with open("%s/%s.xml" % (directory, data.identifier.string), "w") as file:
-            file.write(str(data.prettify()))
+        alert = xmltodict.parse(data)
+        return alert['alert']
 
     def read(self):
         try:
