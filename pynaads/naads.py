@@ -98,6 +98,8 @@ class naads():
                 return False
 
     def filter_in_geo(self, alert, points):
+        if not "info" in alert:
+            return False
         for infos in alert['info']:
             if isinstance(infos, str):
                 if isinstance(alert['info']['area'], OrderedDict):
