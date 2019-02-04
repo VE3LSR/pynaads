@@ -104,17 +104,27 @@ class naads():
             if isinstance(infos, str):
                 if isinstance(alert['info']['area'], OrderedDict):
                     if "polygon" in alert['info']['area']:
-                        return self._filter_in_geo(alert['info']['area']['polygon'], points)
+                        if isinstance(alert['info']['area']['polygon'], str):
+                            return self._filter_in_geo(alert['info']['area']['polygon'], points)
+                        else:
+                            for polygon in alert['info']['area']['polygon']:
+                                return self._filter_in_geo(polygon, points)
                 else:
                     logger.error("Geo Filter not implemented: A")
-                    pass
             else:
                 if isinstance(infos['area'], OrderedDict):
                     if "polygon" in infos['area']:
                         return self._filter_in_geo(infos['area']['polygon'], points)
+                elif isinstance(infos['area'], list):
+                    for area in infos['area']:
+                        if "polygon" in area:
+                            if isinstance(area['polygon'], str):
+                                return self._filter_in_geo(area['polygon'], points)
+                            else:
+                                for polygon in area['polygon']:
+                                    return self._filter_in_geo(polygon, points)
                 else:
-                    logger.error("Geo Filter not implemented: B")
-                    pass
+                    logger.error("Geo Filter not implemented: A")
 
     def parse(self, data):
         alert = xmltodict.parse(data)
