@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 logger = logging.getLogger("naads.event")
 
-copyEvent = ['@xmlns', 'Signature', 'msgType', 'note', 'references', 'restriction', 'scope', 'sender', 'sent', 'source', 'status']
+copyEvent = ['@xmlns', 'identifier', 'Signature', 'msgType', 'note', 'references', 'restriction', 'scope', 'sender', 'sent', 'source', 'status']
 
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -82,13 +82,12 @@ class naadsEvent(naadsBase):
                 if key != 'info':
                     result[key] = value
                 else:
-                    result['info'] = {}
                     if 'area' in value[self.info]:
                         for akey, avalue in value[self.info].items():
                             if akey != 'area':
                                 result[akey] = avalue
                             else:
-                                result['info']['area'] = avalue[self.area]
+                                result.update(avalue[self.area])
                     else:
                         result['info'] = value[self.info]
             self.area += 1
