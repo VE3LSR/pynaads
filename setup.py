@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pynaads",
-    version="0.0.1",
+    version="0.0.2",
     author="VE3LSR / VE3YCA",
     author_email="projects@ve3lsr.ca",
     description="Python library to monitor Pelmorex's NAADS service",

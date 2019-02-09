@@ -9,6 +9,7 @@ import socket
 from threading import Thread
 import queue
 import xmltodict
+from .event import naadsEvent
 
 
 logger = logging.getLogger("naads.pelmorex")
@@ -29,7 +30,7 @@ class naads():
         self.queue = queue.LifoQueue()
 
     def _reconnect(self):
-        logger.debug("Reconnecting")
+        logger.info("Reconnecting")
         self.connected == False
         self.s.close()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,7 +38,7 @@ class naads():
 
     def connect(self):
         while self.connected == False:
-            logger.debug("Connecting")
+            logger.info("Connecting")
             try: 
                 self.s.connect((self.TCP_IP, self.TCP_PORT))
                 self.connected = True
@@ -49,16 +50,16 @@ class naads():
     def local_start(self, queue):
         while 1:
             if self.lastheartbeat + timedelta(minutes=2) < datetime.now():
-                logger.debug('Missing heartbeat')
+                logger.warn('Missing heartbeat')
                 self._reconnect()
             result = self.read()
             if result != False:
                 result = self.parse(result)
-                if result["sender"] != "NAADS-Heartbeat":
-                    logger.info('Alert received', extra={'sender': result["sender"]})
+                if result.event["sender"] != "NAADS-Heartbeat":
+                    logger.info('Alert received', extra={'sender': result.event["sender"]})
                     queue.put(result)
                 else:
-                    logger.debug('Heartbeat received', extra={'sender': result["sender"]})
+                    logger.debug('Heartbeat received', extra={'sender': result.event["sender"]})
                     if self.passhb:
                         queue.put(result)
                     self.lastheartbeat = datetime.now()
@@ -128,7 +129,8 @@ class naads():
 
     def parse(self, data):
         alert = xmltodict.parse(data)
-        return alert['alert']
+        nresult = naadsEvent(alert['alert'])
+        return nresult
 
     def read(self):
         try:
@@ -151,4 +153,3 @@ class naads():
             self.data = self.data[eoa + len(self.EOATEXT):]
             return xml
         return False
-
