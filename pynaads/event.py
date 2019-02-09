@@ -6,6 +6,15 @@ logger = logging.getLogger("naads.event")
 
 copyEvent = ['@xmlns', 'identifier', 'Signature', 'msgType', 'note', 'references', 'restriction', 'scope', 'sender', 'sent', 'source', 'status']
 
+def combine(dictionaries):
+    combined_dict = {}
+    if isinstance(dictionaries, list):
+        for dictionary in dictionaries:
+                combined_dict.setdefault(dictionary['valueName'], []).append(dictionary['value'])
+    elif isinstance(dictionaries, OrderedDict):
+            combined_dict.setdefault(dictionaries['valueName'], []).append(dictionaries['value'])
+    return combined_dict
+
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj,'reprJSON'):
@@ -26,7 +35,13 @@ class naadsBase(dict):
 class naadsArea(naadsBase):
     def __init__(self, info):
         for name, data in info.items():
-            self[name] = data
+            if name == 'geocode':
+                self[name] = combine(data)
+            elif name == 'polygon':
+                self[name] = data
+                self['locaton'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data.split(' ')]}
+            else:
+                self[name] = data
 
 class naadsInfo(naadsBase):
     def __init__(self, info):
@@ -41,6 +56,8 @@ class naadsInfo(naadsBase):
                         self['area'].append(naadsArea(area))
                 else:
                     logger.error("Unknown area type: {}".format(type(data)))
+            elif name == "eventCode" or name == "parameter":
+                self[name] = combine(data)
             else:
                 self[name] = data
 
