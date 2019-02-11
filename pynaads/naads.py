@@ -31,7 +31,7 @@ class naads():
 
     def _reconnect(self):
         logger.info("Reconnecting")
-        self.connected == False
+        self.connected = False
         self.s.close()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect()
