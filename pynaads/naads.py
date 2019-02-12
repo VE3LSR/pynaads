@@ -115,10 +115,17 @@ class naads():
 
     def filter_in_clc(self, alert, clc_code):
         if 'geocode' in alert and 'layer:EC-MSC-SMC:1.0:CLC' in alert['geocode']:
-            if clc_code in alert['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
-                return True
-            else:
-                return False
+                if isinstance(clc_code, str):
+                    if clc_code in alert['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
+                        return True
+                    else:
+                        return False
+                elif isinstance(clc_code, list):
+                    for clc in clc_code:
+                        if clc in alert['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
+                            return True
+                    return False
+
         counter = 0
 
         if ("event" in alert) and ("info" in alert['event']):
