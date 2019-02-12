@@ -81,7 +81,7 @@ class naads():
     #
     # Returns the first point position within the poly or false
 
-    def _filter_in_geo(self, poly, points):
+    def _filter_in_geo_event(self, poly, points):
         p = [tuple(map(float,s.split(','))) for s in poly.split(' ')]
         poly = Polygon(p)
         counter = 0
@@ -98,7 +98,26 @@ class naads():
             else:
                 return False
 
+    def _filter_in_geo_area(self, poly, points):
+        poly = Polygon(poly)
+        if all(isinstance(item, tuple) for item in points):
+            for point in points:
+                counter += 1
+                p1 = Point(point[0], point[1])
+                if p1.within(poly):
+                    return counter
+        else:
+            p1 = Point(points[0], points[1])
+            if p1.within(poly):
+                return 1
+            else:
+                return False
+
+
     def filter_in_geo(self, alert, points):
+        if 'location' in alert and alert['location']['type'] == 'polygon':
+            return self._filter_in_geo_area(alert['location']['coordinates'], points)
+
         if not "info" in alert:
             return False
         for infos in alert['info']:
@@ -106,24 +125,24 @@ class naads():
                 if isinstance(alert['info']['area'], OrderedDict):
                     if "polygon" in alert['info']['area']:
                         if isinstance(alert['info']['area']['polygon'], str):
-                            return self._filter_in_geo(alert['info']['area']['polygon'], points)
+                            return self._filter_in_geo_event(alert['info']['area']['polygon'], points)
                         else:
                             for polygon in alert['info']['area']['polygon']:
-                                return self._filter_in_geo(polygon, points)
+                                return self._filter_in_geo_event(polygon, points)
                 else:
                     logger.error("Geo Filter not implemented: A")
             else:
                 if isinstance(infos['area'], OrderedDict):
                     if "polygon" in infos['area']:
-                        return self._filter_in_geo(infos['area']['polygon'], points)
+                        return self._filter_in_geo_event(infos['area']['polygon'], points)
                 elif isinstance(infos['area'], list):
                     for area in infos['area']:
                         if "polygon" in area:
                             if isinstance(area['polygon'], str):
-                                return self._filter_in_geo(area['polygon'], points)
+                                return self._filter_in_geo_event(area['polygon'], points)
                             else:
                                 for polygon in area['polygon']:
-                                    return self._filter_in_geo(polygon, points)
+                                    return self._filter_in_geo_event(polygon, points)
                 else:
                     logger.error("Geo Filter not implemented: A")
 

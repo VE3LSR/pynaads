@@ -39,7 +39,7 @@ class naadsArea(naadsBase):
                 self[name] = combine(data)
             elif name == 'polygon':
                 self[name] = data
-                self['locaton'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data.split(' ')]}
+                self['location'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data.split(' ')]}
             else:
                 self[name] = data
 

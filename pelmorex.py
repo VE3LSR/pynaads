@@ -32,7 +32,9 @@ def testA():
     print("Return Fail: {}".format(p.filter_in_geo(item, (72.02227211437801, -125.25787353515625))))
     print("Return Return 1: {}".format(p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))))
     for q in item:
-        print(q)
+        print("Item: Return Fail: {}".format(p.filter_in_geo(q, (72.02227211437801, -125.25787353515625))))
+        print("Item: Return Return 1: {}".format(p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))))
+#        print(q)
 
 def testB(): 
     testdata = open("samples/014B55A1-6609-FCA2-BD91-A582E1EBCEF1.xml","r").read()
@@ -40,7 +42,10 @@ def testB():
     print("Should Fail: {}".format(p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))))
     print("Return Return 1: {}".format(p.filter_in_geo(item, (72.02227211437801, -125.25787353515625))))
     for q in item:
-        print(q)
+        print("Item: Should Fail: {}".format(p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))))
+        print("Item: Return Return 1: {}".format(p.filter_in_geo(q, (72.02227211437801, -125.25787353515625))))
+
+#        print(q)
 
 def testC():
     testdata = open("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml","r").read()
@@ -48,7 +53,10 @@ def testC():
     print("Should Fail: {}".format(p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))))
     print("Return Return 1: {}".format(p.filter_in_geo(item, (72.02227211437801, -125.25787353515625))))
     for q in item:
-        print(q)
+        print("Item: Should Fail: {}".format(p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))))
+        print("Item: Return Return 1: {}".format(p.filter_in_geo(q, (72.02227211437801, -125.25787353515625))))
+
+#        print(q)
 
 def testD():
     testdata = open("samples/707363CA-611B-BDDF-0494-A276829793D1.xml","r").read()
@@ -56,7 +64,9 @@ def testD():
     print("Should Fail: {}".format(p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))))
     print("Return Return 1: {}".format(p.filter_in_geo(item, (72.02227211437801, -125.25787353515625))))
     for q in item:
-        print(q)
+        print("Item: Should Fail: {}".format(p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))))
+        print("Item: Return Return 1: {}".format(p.filter_in_geo(q, (72.02227211437801, -125.25787353515625))))
+#        print(q)
 
 def testAll():
     directory = os.fsencode("savedata")
@@ -67,9 +77,9 @@ def testAll():
         print (filename)
         p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))
 
-#testA()
-#testB()
-#testC()
-#testD()
+testA()
+testB()
+testC()
+testD()
 #testAll()
 #run()
