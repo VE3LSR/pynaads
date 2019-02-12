@@ -113,7 +113,6 @@ class naads():
             else:
                 return False
 
-
     def filter_in_geo(self, alert, points):
         if 'location' in alert and alert['location']['type'] == 'polygon':
             return self._filter_in_geo_area(alert['location']['coordinates'], points)
