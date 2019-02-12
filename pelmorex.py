@@ -26,48 +26,6 @@ def run():
                 logger.info(item)
                 logger.info("Non-Local event")
 
-def testA():
-    testdata = open("samples/6example_CAPCP_with_free_drawn_polygon.xml","r").read()
-    item = p.parse(testdata)
-    print("Return Fail: {}".format(p.filter_in_geo(item, (72.02227211437801, -125.25787353515625))))
-    print("Return Return 1: {}".format(p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))))
-    for q in item:
-        print("Item: Return Fail: {}".format(p.filter_in_geo(q, (72.02227211437801, -125.25787353515625))))
-        print("Item: Return Return 1: {}".format(p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))))
-#        print(q)
-
-def testB(): 
-    testdata = open("samples/014B55A1-6609-FCA2-BD91-A582E1EBCEF1.xml","r").read()
-    item = p.parse(testdata)
-    print("Should Fail: {}".format(p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))))
-    print("Return Return 1: {}".format(p.filter_in_geo(item, (72.02227211437801, -125.25787353515625))))
-    for q in item:
-        print("Item: Should Fail: {}".format(p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))))
-        print("Item: Return Return 1: {}".format(p.filter_in_geo(q, (72.02227211437801, -125.25787353515625))))
-
-#        print(q)
-
-def testC():
-    testdata = open("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml","r").read()
-    item = p.parse(testdata)
-    print("Should Fail: {}".format(p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))))
-    print("Return Return 1: {}".format(p.filter_in_geo(item, (72.02227211437801, -125.25787353515625))))
-    for q in item:
-        print("Item: Should Fail: {}".format(p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))))
-        print("Item: Return Return 1: {}".format(p.filter_in_geo(q, (72.02227211437801, -125.25787353515625))))
-
-#        print(q)
-
-def testD():
-    testdata = open("samples/707363CA-611B-BDDF-0494-A276829793D1.xml","r").read()
-    item = p.parse(testdata)
-    print("Should Fail: {}".format(p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))))
-    print("Return Return 1: {}".format(p.filter_in_geo(item, (72.02227211437801, -125.25787353515625))))
-    for q in item:
-        print("Item: Should Fail: {}".format(p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))))
-        print("Item: Return Return 1: {}".format(p.filter_in_geo(q, (72.02227211437801, -125.25787353515625))))
-#        print(q)
-
 def testAll():
     directory = os.fsencode("savedata")
     for file in os.listdir(directory):
@@ -77,9 +35,33 @@ def testAll():
         print (filename)
         p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))
 
-testA()
-testB()
-testC()
-testD()
+def test(file, pointA=None, pointB=None, codeA=None, codeB=None):
+    testdata = open(file,"r").read()
+    item = p.parse(testdata)
+    if pointA and pointB:
+        print("Should Fail: {}".format(p.filter_in_geo(item, pointA)))
+        print("Return Return 1: {}".format(p.filter_in_geo(item, pointB)))
+
+#    if codeA and codeB:
+#        print("Should Return 1: {}".format(p.filter_in_clc(item, codeA)))
+#        print("Should Fail: {}".format(p.filter_in_clc(item, codeB)))
+
+    for q in item:
+        if pointA and pointB:
+            print("Item Point: Should Fail: {}".format(p.filter_in_geo(q, pointA)))
+            print("Item Point: Return Return 1: {}".format(p.filter_in_geo(q, pointB)))
+        if codeA and codeB:
+            print("Item Code: Should Return 1: {}".format(p.filter_in_clc(q, codeA)))
+            print("Item Code: Should Fail: {}".format(p.filter_in_clc(q, codeB)))
+            pass
+
+#        print(q)
+
+
+#test("samples/6example_CAPCP_with_free_drawn_polygon.xml", (72.02227211437801, -125.25787353515625), (51.5072466571743, -99.22714233398436))
+#test("samples/014B55A1-6609-FCA2-BD91-A582E1EBCEF1.xml", (51.5072466571743, -99.22714233398436), (72.02227211437801, -125.25787353515625))
+#test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", pointA=(51.5072466571743, -99.22714233398436), pointB=(72.02227211437801, -125.25787353515625))
+test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", codeA='018200', codeB='999999')
+#test("samples/707363CA-611B-BDDF-0494-A276829793D1.xml", (51.5072466571743, -99.22714233398436), (72.02227211437801, -125.25787353515625))
 #testAll()
 #run()

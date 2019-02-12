@@ -38,8 +38,8 @@ class naadsArea(naadsBase):
             if name == 'geocode':
                 self[name] = combine(data)
             elif name == 'polygon':
+                self[name] = data
                 if isinstance(data, str):
-                    self[name] = data
                     self['location'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data.split(' ')]}
                 else:
                     logger.error("Unsupported list of areas")

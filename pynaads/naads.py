@@ -113,13 +113,36 @@ class naads():
             else:
                 return False
 
+    def filter_in_clc(self, alert, clc_code):
+        if 'geocode' in alert and 'layer:EC-MSC-SMC:1.0:CLC' in alert['geocode']:
+            if clc_code in alert['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
+                return True
+            else:
+                return False
+        counter = 0
+        for infos in alert.event['info']:
+            print (infos)
+            for areas in infos:
+                print (areas)
+                if clc_code in areas['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
+                    counter += 1
+        if counter == 0:
+            return False
+        if counter == 1:
+            return True
+        if counter > 1:
+            return counter
+
     def filter_in_geo(self, alert, points):
         if 'location' in alert and alert['location']['type'] == 'polygon':
             return self._filter_in_geo_area(alert['location']['coordinates'], points)
 
-        if not "info" in alert:
+        if not "event" in alert and not "info" in alert.event:
             return False
-        for infos in alert['info']:
+
+#        print (alert)
+#        print (alert.event['info'])
+        for infos in alert.event['info']:
             if isinstance(infos, str):
                 if isinstance(alert['info']['area'], OrderedDict):
                     if "polygon" in alert['info']['area']:
