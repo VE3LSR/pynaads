@@ -42,6 +42,7 @@ class naadsArea(naadsBase):
                 if isinstance(data, str):
                     self['location'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data.split(' ')]}
                 else:
+                    self['location'] = {'type': 'unsupported'}
                     logger.error("Unsupported list of areas")
             else:
                 self[name] = data

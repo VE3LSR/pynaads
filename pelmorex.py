@@ -33,7 +33,9 @@ def testAll():
         testdata = open("savedata/{}".format(filename),"r").read()
         item = p.parse(testdata)
         print (filename)
-        p.filter_in_geo(item, (51.5072466571743, -99.22714233398436))
+        for q in item:
+            p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))
+            p.filter_in_clc(q, "018200")
 
 def test(file, pointA=None, pointB=None, codeA=None, codeB=None):
     testdata = open(file,"r").read()
@@ -61,7 +63,7 @@ def test(file, pointA=None, pointB=None, codeA=None, codeB=None):
 #test("samples/6example_CAPCP_with_free_drawn_polygon.xml", (72.02227211437801, -125.25787353515625), (51.5072466571743, -99.22714233398436))
 #test("samples/014B55A1-6609-FCA2-BD91-A582E1EBCEF1.xml", (51.5072466571743, -99.22714233398436), (72.02227211437801, -125.25787353515625))
 #test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", pointA=(51.5072466571743, -99.22714233398436), pointB=(72.02227211437801, -125.25787353515625))
-test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", codeA='018200', codeB='999999')
+#test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", codeA='018200', codeB='999999')
 #test("samples/707363CA-611B-BDDF-0494-A276829793D1.xml", (51.5072466571743, -99.22714233398436), (72.02227211437801, -125.25787353515625))
-#testAll()
+testAll()
 #run()
