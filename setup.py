@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pynaads",
-    version="0.0.3",
+    version="0.0.4",
     author="VE3LSR / VE3YCA",
     author_email="projects@ve3lsr.ca",
     description="Python library to monitor Pelmorex's NAADS service",
@@ -16,5 +16,8 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
+    ],
+    install_requires=[
+        'shapely',
     ],
 )
