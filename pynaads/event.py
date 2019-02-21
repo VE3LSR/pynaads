@@ -46,6 +46,8 @@ class naadsArea(naadsBase):
         for name, data in info.items():
             if name == 'geocode':
                 self[name] = combine(data)
+            elif name == 'areaDesc':
+                self[name] = data
             elif name == 'polygon':
                 self[name] = data
                 if isinstance(data, str):
@@ -62,8 +64,8 @@ class naadsArea(naadsBase):
                     self['location'] = {'type': 'unsupported'}
                     logger.error("Unsupported type of polygon area: {}".format(type(data)))
             else:
-                self[name] = data
-        print(self['location'])
+                logger.error("Unsupported Geo Type: {}".format(name))
+#        print(self['location'])
 
 class naadsInfo(naadsBase):
     def __init__(self, info):
