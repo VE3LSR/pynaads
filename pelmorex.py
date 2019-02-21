@@ -27,8 +27,9 @@ def run():
                 logger.info("Non-Local event")
 
 def testAll():
-    d = "sample/download"
+#    d = "sample/download"
 #    d = "sample/broken"
+    d = "samples"
     directory = os.fsencode(d)
     for file in os.listdir(directory):
         filename = os.fsdecode(file)

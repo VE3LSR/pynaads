@@ -3,6 +3,7 @@ import crcmod
 import json
 import logging
 from collections import OrderedDict
+from geojson import Polygon, MultiPolygon
 
 logger = logging.getLogger("naads.event")
 
@@ -17,6 +18,11 @@ def combine(dictionaries):
     elif isinstance(dictionaries, OrderedDict):
             combined_dict.setdefault(dictionaries['valueName'], []).append(dictionaries['value'])
     return combined_dict
+
+def convertGeo(data):
+    data = [tuple(map(float,s.split(','))) for s in data.split(' ')]
+    data = [(t[1], t[0]) for t in data] 
+    return [data]
 
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -46,19 +52,18 @@ class naadsArea(naadsBase):
                     if ' ' not in data:
                         logger.error("Bad Polygon")
                         return None
-                    self['location'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data.split(' ')]}
+                    self['location'] = Polygon(convertGeo(data))
                 elif isinstance(data, list):
-                    if len(data) == 1:
-                        self['location'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data[0].split(' ')]}
-                    else: 
-                        self['location'] = {'type': 'unsupported'}
-                        logger.debug(data)
-                        logger.error("Unsupported type of polygon area - Long List")
+                    polydict = []
+                    for poly in data:
+                        polydict.append(convertGeo(poly))
+                    self['location'] = MultiPolygon(polydict)
                 else:
                     self['location'] = {'type': 'unsupported'}
                     logger.error("Unsupported type of polygon area: {}".format(type(data)))
             else:
                 self[name] = data
+        print(self['location'])
 
 class naadsInfo(naadsBase):
     def __init__(self, info):
