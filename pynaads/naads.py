@@ -183,9 +183,18 @@ class naads():
                     logger.error("Geo Filter not implemented: A")
 
     def parse(self, data):
-        alert = xmltodict.parse(data)
-        nresult = naadsEvent(alert['alert'])
-        return nresult
+        for attempt in range (5):
+            try:
+                alert = xmltodict.parse(data)
+            except:
+                logger.warn("Bad XML? Retrying")
+            else:
+                nresult = naadsEvent(alert['alert'])
+                return nresult
+                break
+        else:
+            logger.error("Bad XML - Unable to parse")
+            return False
 
     def read(self):
         try:

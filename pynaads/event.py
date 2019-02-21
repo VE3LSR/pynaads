@@ -1,3 +1,5 @@
+import hashlib
+import crcmod
 import json
 import logging
 from collections import OrderedDict
@@ -5,6 +7,7 @@ from collections import OrderedDict
 logger = logging.getLogger("naads.event")
 
 copyEvent = ['@xmlns', 'identifier', 'Signature', 'msgType', 'note', 'references', 'restriction', 'scope', 'sender', 'sent', 'source', 'status']
+crc_func = crcmod.predefined.mkCrcFun('crc-32')
 
 def combine(dictionaries):
     combined_dict = {}
@@ -40,10 +43,20 @@ class naadsArea(naadsBase):
             elif name == 'polygon':
                 self[name] = data
                 if isinstance(data, str):
+                    if ' ' not in data:
+                        logger.error("Bad Polygon")
+                        return None
                     self['location'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data.split(' ')]}
+                elif isinstance(data, list):
+                    if len(data) == 1:
+                        self['location'] = {'type': 'polygon', 'coordinates': [tuple(map(float,s.split(','))) for s in data[0].split(' ')]}
+                    else: 
+                        self['location'] = {'type': 'unsupported'}
+                        logger.debug(data)
+                        logger.error("Unsupported type of polygon area - Long List")
                 else:
                     self['location'] = {'type': 'unsupported'}
-                    logger.error("Unsupported list of areas")
+                    logger.error("Unsupported type of polygon area: {}".format(type(data)))
             else:
                 self[name] = data
 
@@ -115,7 +128,7 @@ class naadsEvent(naadsBase):
             if self.area >= len(self.event['info'][self.info]['area']):
                 self.info += 1
                 self.area = 0
-            return result
+            return self.genIDs(result)
         else:
             raise StopIteration
 
@@ -127,3 +140,33 @@ class naadsEvent(naadsBase):
     def __len__(self):
         pass
 
+    def genIDs(self, event):
+        # IDs should be generated using the following (if available)
+        # - identifier
+        # and one or more of the following:
+        # - polygon
+        # - geocode.profile:CAP-CP:Location:0.3 
+        # - geocode.layer:EC-MSC-SMC:1.0:CLC
+        # If this is not possible, error!
+        finalcode = ""
+        gotLoc = False
+        if 'identifier' in event:
+            finalcode += event['identifier']
+        else:
+            logger.error("Event has no identifier")
+        if 'polygon' in event:
+            finalcode += event['polygon']
+            gotLoc = True
+        if 'geocode' in event: 
+            if 'layer:EC-MSC-SMC:1.0:CLC' in event['geocode']:
+                finalcode += ''.join(str(e) for e in event['geocode']['layer:EC-MSC-SMC:1.0:CLC'])
+                gotLoc = True
+            if 'profile:CAP-CP:Location:0.3' in event['geocode']:
+                finalcode += ''.join(str(e) for e in event['geocode']['profile:CAP-CP:Location:0.3'])
+                gotLoc = True
+        if gotLoc == True:
+            event['id'] = hashlib.sha256(finalcode.encode()).hexdigest()
+            event['search_id'] = '{:x}'.format(crc_func(finalcode.encode()))
+        else:
+            logger.error("Event does not have specific enough details for uniq ID")
+        return event

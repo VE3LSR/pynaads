@@ -7,7 +7,7 @@ import json
 import os
 
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setFormatter(colorlog.ColoredFormatter('%(log_color)s%(asctime)s - %(levelname)s - %(name)s - %(message)s'))
 logger.addHandler(handler)
@@ -27,15 +27,17 @@ def run():
                 logger.info("Non-Local event")
 
 def testAll():
-    directory = os.fsencode("savedata")
+    d = "sample/download"
+#    d = "sample/broken"
+    directory = os.fsencode(d)
     for file in os.listdir(directory):
         filename = os.fsdecode(file)
-        testdata = open("savedata/{}".format(filename),"r").read()
+        testdata = open("{}/{}".format(d, filename),"r").read()
+        logger.info(filename)
         item = p.parse(testdata)
-        print (filename)
-        for q in item:
-            p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))
-            p.filter_in_clc(q, "018200")
+#        for q in item:
+#            p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))
+#            p.filter_in_clc(q, "018200")
 
 def test(file, pointA=None, pointB=None, codeA=None, codeB=None):
     testdata = open(file,"r").read()
@@ -70,8 +72,11 @@ def test(file, pointA=None, pointB=None, codeA=None, codeB=None):
 #test("samples/6example_CAPCP_with_free_drawn_polygon.xml", (72.02227211437801, -125.25787353515625), (51.5072466571743, -99.22714233398436))
 #test("samples/014B55A1-6609-FCA2-BD91-A582E1EBCEF1.xml", (51.5072466571743, -99.22714233398436), (72.02227211437801, -125.25787353515625))
 #test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", pointA=(51.5072466571743, -99.22714233398436), pointB=(72.02227211437801, -125.25787353515625))
-test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", codeA='018200', codeB='999999')
+#test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", codeA='018200', codeB='999999')
+#test("samples/1.xml")
 #test("samples/urn:oid:2.49.0.1.124.2651896163.2018.xml", codeA=['018200'], codeB=['999999'])
 #test("samples/707363CA-611B-BDDF-0494-A276829793D1.xml", (51.5072466571743, -99.22714233398436), (72.02227211437801, -125.25787353515625))
-#testAll()
+
+#for i in range(10000):
+testAll()
 #run()
