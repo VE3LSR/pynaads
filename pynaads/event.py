@@ -119,6 +119,7 @@ class naadsEvent(naadsBase):
     # Get current item, and increase counter
     def __next__(self):
         result = {}
+        hasareas = True
         if 'info' in self.event:
             if self.info >= len(self.event['info']):
                 raise StopIteration
@@ -142,7 +143,8 @@ class naadsEvent(naadsBase):
             else:
                 self.info += 1
                 self.area = 0
-            return self.genIDs(result)
+                hasareas = False
+            return self.genIDs(result, hasareas)
         else:
             raise StopIteration
 
@@ -154,17 +156,20 @@ class naadsEvent(naadsBase):
     def __len__(self):
         pass
 
-    def genIDs(self, event):
+    def genIDs(self, event, hasareas):
         # IDs must be generated using the following:
         # - identifier
         # - Language
-        # and one or more of the following:
+        # and one or more of the following (When there are multiple areas):
         # - polygon
         # - geocode.profile:CAP-CP:Location:0.3 
         # - geocode.layer:EC-MSC-SMC:1.0:CLC
         # If this is not possible, error!
         finalcode = ""
-        gotLoc = False
+        if hasareas:
+            gotLoc = False
+        else:
+            gotLoc = True
         if 'identifier' in event:
             finalcode += event['identifier']
         else:
