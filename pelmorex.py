@@ -27,8 +27,8 @@ def run():
                 logger.info("Non-Local event")
 
 def testAll():
-#    d = "sample/download"
-    d = "sample/broken"
+    d = "sample/download"
+#    d = "sample/broken"
 #    d = "samples"
     directory = os.fsencode(d)
     for file in os.listdir(directory):
@@ -36,9 +36,10 @@ def testAll():
         testdata = open("{}/{}".format(d, filename),"r").read()
         logger.info(filename)
         item = p.parse(testdata)
-        for q in item:
-#            p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))
-            p.filter_in_clc(q, "018200")
+        if item != False:
+            for q in item:
+#                p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))
+                p.filter_in_clc(q, "018200")
 
 def test(file, pointA=None, pointB=None, codeA=None, codeB=None):
     testdata = open(file,"r").read()

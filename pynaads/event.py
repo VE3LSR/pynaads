@@ -151,8 +151,9 @@ class naadsEvent(naadsBase):
         pass
 
     def genIDs(self, event):
-        # IDs should be generated using the following (if available)
+        # IDs must be generated using the following:
         # - identifier
+        # - Language
         # and one or more of the following:
         # - polygon
         # - geocode.profile:CAP-CP:Location:0.3 
@@ -164,6 +165,10 @@ class naadsEvent(naadsBase):
             finalcode += event['identifier']
         else:
             logger.error("Event has no identifier")
+        if 'language' in event:
+            finalcode += event['language']
+        else:
+            logger.error("Event has no language")
         if 'polygon' in event:
             if isinstance(event['polygon'], str):
                 finalcode += event['polygon']
