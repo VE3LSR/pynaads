@@ -133,9 +133,13 @@ class naadsEvent(naadsBase):
                             else:
                                 result.update(avalue[self.area])
                     else:
-                        result['info'] = value[self.info]
+                        result.update(value[self.info])
             self.area += 1
-            if self.area >= len(self.event['info'][self.info]['area']):
+            if 'area' in self.event['info'][self.info]:
+                if self.area >= len(self.event['info'][self.info]['area']):
+                    self.info += 1
+                    self.area = 0
+            else:
                 self.info += 1
                 self.area = 0
             return self.genIDs(result)
