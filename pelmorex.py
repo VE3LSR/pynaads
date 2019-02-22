@@ -28,17 +28,17 @@ def run():
 
 def testAll():
 #    d = "sample/download"
-#    d = "sample/broken"
-    d = "samples"
+    d = "sample/broken"
+#    d = "samples"
     directory = os.fsencode(d)
     for file in os.listdir(directory):
         filename = os.fsdecode(file)
         testdata = open("{}/{}".format(d, filename),"r").read()
         logger.info(filename)
         item = p.parse(testdata)
-#        for q in item:
+        for q in item:
 #            p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))
-#            p.filter_in_clc(q, "018200")
+            p.filter_in_clc(q, "018200")
 
 def test(file, pointA=None, pointB=None, codeA=None, codeB=None):
     testdata = open(file,"r").read()

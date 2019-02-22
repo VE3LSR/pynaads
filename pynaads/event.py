@@ -63,6 +63,9 @@ class naadsArea(naadsBase):
                 else:
                     self['location'] = {'type': 'unsupported'}
                     logger.error("Unsupported type of polygon area: {}".format(type(data)))
+#            elif name == 'circle':
+                # <circle>51.507709,-99.233116 2.26</circle>
+                # There is no GeoJSON Cicle types, thus needs to be converted to a polygon of sides
             else:
                 logger.error("Unsupported Geo Type: {}".format(name))
 #        print(self['location'])
@@ -162,7 +165,11 @@ class naadsEvent(naadsBase):
         else:
             logger.error("Event has no identifier")
         if 'polygon' in event:
-            finalcode += event['polygon']
+            if isinstance(event['polygon'], str):
+                finalcode += event['polygon']
+            elif isinstance(event['polygon'], list):
+                for a in event['polygon']:
+                    finalcode += a
             gotLoc = True
         if 'geocode' in event: 
             if 'layer:EC-MSC-SMC:1.0:CLC' in event['geocode']:
