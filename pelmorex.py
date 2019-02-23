@@ -38,7 +38,7 @@ def testAll():
         item = p.parse(testdata)
         if item != False:
             for q in item:
-#                p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))
+                p.filter_in_geo(q, (51.5072466571743, -99.22714233398436))
                 p.filter_in_clc(q, "018200")
 
 def test(file, pointA=None, pointB=None, codeA=None, codeB=None):

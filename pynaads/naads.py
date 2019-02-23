@@ -116,73 +116,39 @@ class naads():
                 return False
 
     def filter_in_clc(self, alert, clc_code):
-        if 'geocode' in alert and 'layer:EC-MSC-SMC:1.0:CLC' in alert['geocode']:
-                if isinstance(clc_code, str):
-                    if clc_code in alert['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
-                        return True
-                    else:
-                        return False
-                elif isinstance(clc_code, list):
-                    for clc in clc_code:
-                        if clc in alert['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
+        if (isinstance(alert, naadsEvent)):
+            logger.error("Filtering of full event not supported yet")
+            return False
+        else:
+            if 'geocode' in alert and 'layer:EC-MSC-SMC:1.0:CLC' in alert['geocode']:
+                    if isinstance(clc_code, str):
+                        if clc_code in alert['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
                             return True
-                    return False
+                        else:
+                            return False
+                    elif isinstance(clc_code, list):
+                        for clc in clc_code:
+                            if clc in alert['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
+                                return True
+                        return False
 
-        counter = 0
-
-        if ("event" in alert) and ("info" in alert['event']):
-            print (alert)
-            for infos in alert.event['info']:
-                print (infos)
-                for areas in infos:
-                    print (areas)
-                    if clc_code in areas['geocode']['layer:EC-MSC-SMC:1.0:CLC']:
-                        counter += 1
-            if counter == 0:
-                return False
-            if counter == 1:
-                return True
-            if counter > 1:
-                return counter
 
     def filter_in_geo(self, alert, points):
-        if 'location' in alert:
-            if alert['location']['type'] == 'polygon':
-                return self._filter_in_geo_area(alert['location']['coordinates'], points)
-            else:
-                logger.error("Location Type not supported yet")
-                return False
-
-        if not "event" in alert and not "info" in alert.event:
+        if (isinstance(alert, naadsEvent)):
+            logger.error("Filtering of full event not supported yet")
             return False
-
-#        print (alert)
-#        print (alert.event['info'])
-        for infos in alert.event['info']:
-            if isinstance(infos, str):
-                if isinstance(alert['info']['area'], OrderedDict):
-                    if "polygon" in alert['info']['area']:
-                        if isinstance(alert['info']['area']['polygon'], str):
-                            return self._filter_in_geo_event(alert['info']['area']['polygon'], points)
-                        else:
-                            for polygon in alert['info']['area']['polygon']:
-                                return self._filter_in_geo_event(polygon, points)
+        else:
+            if 'location' in alert:
+                if alert['location']['type'] == 'Polygon':
+                    return self._filter_in_geo_area(alert['location']['coordinates'][0], points)
+                elif alert['location']['type'] == 'MultiPolygon':
+                    counter = 0
+                    for area in alert['location']['coordinates']:
+                        counter += self._filter_in_geo_area(area[0], points)
+                    return counter
                 else:
-                    logger.error("Geo Filter not implemented: A")
-            else:
-                if isinstance(infos['area'], OrderedDict):
-                    if "polygon" in infos['area']:
-                        return self._filter_in_geo_event(infos['area']['polygon'], points)
-                elif isinstance(infos['area'], list):
-                    for area in infos['area']:
-                        if "polygon" in area:
-                            if isinstance(area['polygon'], str):
-                                return self._filter_in_geo_event(area['polygon'], points)
-                            else:
-                                for polygon in area['polygon']:
-                                    return self._filter_in_geo_event(polygon, points)
-                else:
-                    logger.error("Geo Filter not implemented: A")
+                    logger.error("Filter location type not supported yet - {}".format(alert['location']['type']))
+                    return False
 
     def parse(self, data):
         for attempt in range (5):
