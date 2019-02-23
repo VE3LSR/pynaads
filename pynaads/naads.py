@@ -18,8 +18,8 @@ logger = logging.getLogger("naads.pelmorex")
 class naads():
     def __init__(self, passhb=False):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.TCP_HOST="streaming2.naad-adna.pelmorex.com"
-        self.TCP_IP = socket.gethostbyname( self.TCP_HOST )
+        self.TCP_HOST=["streaming1.naad-adna.pelmorex.com", "streaming2.naad-adna.pelmorex.com"]
+        self.TCP_HOST_ID = 0
         self.TCP_PORT=8080
         self.BUFFER_SIZE=4098
         self.data = None
@@ -31,6 +31,7 @@ class naads():
 
     def _reconnect(self):
         logger.info("Reconnecting")
+        self.TCP_HOST_ID = not self.TCP_HOST_ID
         self.connected = False
         self.s.close()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -40,10 +41,11 @@ class naads():
         while self.connected == False:
             logger.info("Connecting")
             try: 
+                self.TCP_IP = socket.gethostbyname( self.TCP_HOST[self.TCP_HOST_ID] )
                 self.s.connect((self.TCP_IP, self.TCP_PORT))
                 self.connected = True
             except:
-                pass
+                self.TCP_HOST_ID = not self.TCP_HOST_ID
         self.s.settimeout(10)
         self.lastheartbeat = datetime.now()
 
