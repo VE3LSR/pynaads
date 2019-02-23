@@ -139,16 +139,31 @@ class naads():
             return False
         else:
             if 'location' in alert:
-                if alert['location']['type'] == 'Polygon':
-                    return self._filter_in_geo_area(alert['location']['coordinates'][0], points)
-                elif alert['location']['type'] == 'MultiPolygon':
+                if isinstance(points, tuple):
+                    if alert['location']['type'] == 'Polygon':
+                        return self._filter_in_geo_area(alert['location']['coordinates'][0], points)
+                    elif alert['location']['type'] == 'MultiPolygon':
+                        counter = 0
+                        for area in alert['location']['coordinates']:
+                            counter += self._filter_in_geo_area(area[0], points)
+                        return counter
+                    else:
+                        logger.error("Filter location type not supported yet - {}".format(alert['location']['type']))
+                        return False
+                elif isinstance(points, list):
                     counter = 0
-                    for area in alert['location']['coordinates']:
-                        counter += self._filter_in_geo_area(area[0], points)
-                    return counter
-                else:
-                    logger.error("Filter location type not supported yet - {}".format(alert['location']['type']))
-                    return False
+                    for point in points:
+                        if alert['location']['type'] == 'Polygon':
+                            return self._filter_in_geo_area(alert['location']['coordinates'][0], point)
+                        elif alert['location']['type'] == 'MultiPolygon':
+                            counter = 0
+                            for area in alert['location']['coordinates']:
+                                counter += self._filter_in_geo_area(area[0], point)
+                            return counter
+                        else:
+                            logger.error("Filter location type not supported yet - {}".format(alert['location']['type']))
+                            return False
+
 
     def parse(self, data):
         for attempt in range (5):
