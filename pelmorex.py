@@ -20,7 +20,7 @@ def run():
     while True:
         item = p.getQueue()
         if item != False:
-            if p.filter_in_geo(item, (44.389355, -79.690331)):
+            if p.filter_in_geo(item, (-79.690331, 44.389355)):
                 logger.info(item)
             else:
                 logger.info(item)
@@ -28,8 +28,8 @@ def run():
 
 def testAll():
 #    d = "sample/download"
-#    d = "sample/broken"
-    d = "samples"
+    d = "sample/broken"
+#    d = "samples"
     directory = os.fsencode(d)
     for file in os.listdir(directory):
         filename = os.fsdecode(file)
@@ -38,8 +38,8 @@ def testAll():
         item = p.parse(testdata)
         if item != False:
             for q in item:
-                p.filter_in_geo(q, (-99.22714233398436, 51.5072466571743))
-                p.filter_in_clc(q, "018200")
+                print (p.filter_in_geo(q, (-79.43046569824219, 44.596823699714406)))
+#                print (p.filter_in_clc(q, "044120"))
 
 def test(file, pointA=None, pointB=None, codeA=None, codeB=None):
     testdata = open(file,"r").read()
