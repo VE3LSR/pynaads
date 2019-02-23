@@ -2,6 +2,9 @@ import hashlib
 import crcmod
 import json
 import logging
+import numpy as np
+import geog
+import shapely.geometry
 from collections import OrderedDict
 from geojson import Polygon, MultiPolygon
 
@@ -63,9 +66,15 @@ class naadsArea(naadsBase):
                 else:
                     self['location'] = {'type': 'unsupported'}
                     logger.error("Unsupported type of polygon area: {}".format(type(data)))
-#            elif name == 'circle':
+            elif name == 'circle':
                 # <circle>51.507709,-99.233116 2.26</circle>
                 # There is no GeoJSON Cicle types, thus needs to be converted to a polygon of sides
+                circlePoint = data.split(' ')[0]
+                circleSize = float(data.split(' ')[1]) * 1000
+                point = shapely.geometry.Point([float(circlePoint.split(',')[1]),float(circlePoint.split(',')[0])])
+                angles = np.linspace(0,360, 40)
+                polygon = geog.propagate(point, angles, circleSize)
+                self['location'] = shapely.geometry.mapping(shapely.geometry.Polygon(polygon))
             else:
                 logger.error("Unsupported Geo Type: {}".format(name))
 #        print(self['location'])
