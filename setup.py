@@ -21,6 +21,7 @@ setuptools.setup(
         'shapely',
         'xmltodict',
         'numpy',
-        'geog'
+        'geog',
+        'geojson'
     ],
 )
