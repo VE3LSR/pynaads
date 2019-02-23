@@ -20,6 +20,7 @@ setuptools.setup(
     install_requires=[
         'shapely',
         'xmltodict',
-        'numpy'
+        'numpy',
+        'geog'
     ],
 )
