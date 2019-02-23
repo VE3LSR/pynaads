@@ -2,8 +2,9 @@
 
 import colorlog
 import logging
-from pynaads import pynaads
+import pynaads
 import json
+import time
 from elasticsearch import Elasticsearch
 
 logger = logging.getLogger()
@@ -13,20 +14,27 @@ handler.setFormatter(colorlog.ColoredFormatter('%(log_color)s%(asctime)s - %(lev
 logger.addHandler(handler)
 p = pynaads.naads(passhb=False)
 
+clcs = ['044110', '044120', '044130', '044440', '044410', '043220', '046520']
+
 def run():
     p.connect()
     p.start()
     es = Elasticsearch("http://10.0.10.41:9200")
 
     while True:
+        time.sleep(0.2)
         item = p.getQueue()
         if item != False:
+            esItems = []
+            counter = 0
             for q in item:
-                if p.filter_in_geo(q, (44.389355, -79.690331)):
+                q['local-event'] = False
+                if p.filter_in_clc(q, clcs):
+                    logger.info("Local Event")
                     q['local-event'] = True
-                    logger.info(item)
-                else:
-                    q['local-event'] = False
-                    logger.info("Non-Local event")
-                es.index(index="naads", body=q, doc_type="_doc")
+                esItems.append({'index': {'_id': q['id']}})
+                esItems.append(q)
+                counter += 1
+            logger.info("Total events: {}".format(counter))
+            es.bulk(index="naads", doc_type="_doc", body=esItems)
 run()
