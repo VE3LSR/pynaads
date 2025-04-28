@@ -22,6 +22,7 @@ setuptools.setup(
         'xmltodict',
         'numpy',
         'geog',
-        'geojson'
+        'geojson',
+        'crcmod'
     ],
 )
