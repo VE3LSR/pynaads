@@ -39,7 +39,7 @@ class naads():
 
     def connect(self):
         while self.connected == False:
-            logger.info("Connecting")
+            logger.debug("Connecting")
             try: 
                 self.TCP_IP = socket.gethostbyname( self.TCP_HOST[self.TCP_HOST_ID] )
                 self.s.connect((self.TCP_IP, self.TCP_PORT))
@@ -48,6 +48,7 @@ class naads():
                 self.TCP_HOST_ID = not self.TCP_HOST_ID
         self.s.settimeout(10)
         self.lastheartbeat = datetime.now()
+        logger.info("Connected")
 
     def local_start(self, queue):
         while 1:
@@ -58,7 +59,7 @@ class naads():
             if result != False:
                 result = self.parse(result)
                 if result.event["sender"] != "NAADS-Heartbeat":
-                    logger.info('Alert received', extra={'sender': result.event["sender"]})
+                    logger.debug('Alert received', extra={'sender': result.event["sender"]})
                     queue.put(result)
                 else:
                     logger.debug('Heartbeat received', extra={'sender': result.event["sender"]})
