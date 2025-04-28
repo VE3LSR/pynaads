@@ -6,5 +6,5 @@ def getfile(file):
         return f.read()
 
 @pytest.fixture
-def tester():
+def sample01():
     return getfile(Path(__file__).parent / "samples/Sample1_CAPCP_No_Attachment.xml")
