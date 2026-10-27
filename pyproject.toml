@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pynaads"
+version = "1.0.0"
+description = "Python library to monitor Pelmorex's NAADS service"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+  { name = "VE3LSR / VE3YCA", email = "projects@ve3lsr.ca" },
+]
+keywords = ["naads", "pelmorex", "weather", "alerts", "cap"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+  "shapely",
+  "xmltodict",
+  "numpy",
+  "geog",
+  "geojson",
+  "crcmod",
+]
+
+[project.urls]
+Homepage = "https://github.com/VE3LSR/pynaads"
+Repository = "https://github.com/VE3LSR/pynaads"
+Issues = "https://github.com/VE3LSR/pynaads/issues"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["pynaads*"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
