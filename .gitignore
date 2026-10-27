@@ -48,6 +48,7 @@ coverage.xml
 .hypothesis/
 venv/
 .venv/
+.naads/
 .python-version
 .pytest_cache
 
